@@ -1,5 +1,5 @@
 "use client"
-import "./globals.css";
+
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
 import { Input } from "./components/ui/input"
@@ -7,8 +7,8 @@ import { Button } from "./components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar"
 import { Progress } from "./components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table"
-import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts'
-import { Bell, Search, ChevronDown, Home, LayoutDashboard, AlertTriangle, CheckSquare, MessageSquare, Settings, LogOut, AlertCircle, Clock, CheckCircle, XCircle, Menu, ChevronRight } from 'lucide-react'
+import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts'
+import { Bell, Search, ChevronDown, Home, LayoutDashboard, AlertTriangle, CheckSquare, MessageSquare, Settings, LogOut, AlertCircle, Clock, CheckCircle, XCircle, Menu, ChevronRight, Sun, Moon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,20 +19,17 @@ import { Label } from "./components/ui/label"
 import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select"
 import { Textarea } from "./components/ui/textarea"
-import worldCountries from './components/ui/geofeatures.json'
-import { ComposableMap, Geographies, Geography } from "react-simple-maps"
-import { TooltipProvider } from "./components/ui/tooltip"
-import { FeatureAccessor, ResponsiveChoropleth } from '@nivo/geo'
-import { useTheme } from '@mui/material'
+import { Switch } from "./components/ui/switch"
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "./components/ui/tooltip"
+import { ResponsiveChoropleth } from '@nivo/geo'
 import { Feature, FeatureCollection } from 'geojson'
-import { scaleThreshold  } from 'd3-scale'
+import { scaleThreshold } from 'd3-scale'
+import worldCountries from './components/ui/geofeatures.json'
 
 interface ChoroplethData {
   id: string
   value: number
 }
-
-
 
 // Test data generation
 const generateTestData = () => {
@@ -72,7 +69,6 @@ const generateTestData = () => {
     mitigated: Math.floor(Math.random() * 300) + 100,
   }));
 
-
   const sampleDropdownData = {
     sites: ["Australia", "Peru", "Canada", "Chile", "Africa"],
     operationCenters: ["Kinawa-OP1", "Kinawa-OP2", "Smith-OP1", "Smith-OP3"],
@@ -95,8 +91,8 @@ const generateTestData = () => {
   ];
 
   const colorScale = scaleThreshold<number, string>()
-  .domain([1])
-  .range(["#FFFFFF", "#3357FF"])
+    .domain([1])
+    .range(["#FFFFFF", "#3357FF"])
 
   const geoData: Feature[] = (worldCountries as FeatureCollection).features;
 
@@ -125,17 +121,17 @@ interface StatusCardProps {
 
 const StatusCard: React.FC<StatusCardProps> = ({ title, value, change, color, icon: Icon }) => {
   const bgColorClass = {
-    red: 'bg-red-50',
-    yellow: 'bg-yellow-50',
-    green: 'bg-green-50',
-    purple: 'bg-purple-50',
+    red: 'bg-red-50 dark:bg-red-900',
+    yellow: 'bg-yellow-50 dark:bg-yellow-900',
+    green: 'bg-green-50 dark:bg-green-900',
+    purple: 'bg-purple-50 dark:bg-purple-900',
   }[color]
 
   const textColorClass = {
-    red: 'text-red-500',
-    yellow: 'text-yellow-500',
-    green: 'text-green-500',
-    purple: 'text-purple-500',
+    red: 'text-red-500 dark:text-red-400',
+    yellow: 'text-yellow-500 dark:text-yellow-400',
+    green: 'text-green-500 dark:text-green-400',
+    purple: 'text-purple-500 dark:text-purple-400',
   }[color]
 
   return (
@@ -161,7 +157,7 @@ const SidebarItem: React.FC<{
 }> = ({ icon: Icon, children, onClick, active, collapsed }) => (
   <Button
     variant="ghost"
-    className={`w-full justify-start text-white ${active ? 'bg-indigo-700' : ''} ${
+    className={`w-full justify-start text-white ${active ? 'bg-indigo-700 dark:bg-gray-700' : ''} ${
       collapsed ? 'px-2' : 'px-4'
     }`}
     onClick={onClick}
@@ -172,7 +168,7 @@ const SidebarItem: React.FC<{
 )
 
 const Breadcrumbs: React.FC<{ items: string[] }> = ({ items }) => (
-  <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
     {items.map((item, index) => (
       <React.Fragment key={index}>
         {index > 0 && <ChevronRight className="h-4 w-4" />}
@@ -183,9 +179,9 @@ const Breadcrumbs: React.FC<{ items: string[] }> = ({ items }) => (
 )
 
 const ChartCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <Card className="h-full">
+  <Card className="h-full dark:bg-gray-800">
     <CardHeader>
-      <CardTitle className="text-lg font-semibold break-words">{title}</CardTitle>
+      <CardTitle className="text-lg font-semibold break-words dark:text-white">{title}</CardTitle>
     </CardHeader>
     <CardContent className="p-0">
       {children}
@@ -195,46 +191,46 @@ const ChartCard: React.FC<{ title: string; children: React.ReactNode }> = ({ tit
 
 const HazardManagementScreen: React.FC = () => (
   <div className="space-y-4">
-    <h2 className="text-2xl font-bold">Hazard Management</h2>
-    <Card>
+    <h2 className="text-2xl font-bold dark:text-white">Hazard Management</h2>
+    <Card className="dark:bg-gray-800">
       <CardHeader>
-        <CardTitle>Create Hazard</CardTitle>
+        <CardTitle className="dark:text-white">Create Hazard</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="copyHazard">Copy Hazard from</Label>
-            <Input id="copyHazard" placeholder="Search Hazard number" />
+            <Label htmlFor="copyHazard" className="dark:text-white">Copy Hazard from</Label>
+            <Input id="copyHazard" placeholder="Search Hazard number" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="hazardId">Hazard Management ID Number</Label>
-            <Input id="hazardId" placeholder="32-HM-1191" />
+            <Label htmlFor="hazardId" className="dark:text-white">Hazard Management ID Number</Label>
+            <Input id="hazardId" placeholder="32-HM-1191" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label>Priority</Label>
+            <Label className="dark:text-white">Priority</Label>
             <RadioGroup defaultValue="medium">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="veryHigh" id="veryHigh" />
-                <Label htmlFor="veryHigh">Very High</Label>
+                <Label htmlFor="veryHigh" className="dark:text-white">Very High</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="high" id="high" />
-                <Label htmlFor="high">High</Label>
+                <Label htmlFor="high" className="dark:text-white">High</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="medium" id="medium" />
-                <Label htmlFor="medium">Medium</Label>
+                <Label htmlFor="medium" className="dark:text-white">Medium</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="low" id="low" />
-                <Label htmlFor="low">Low</Label>
+                <Label htmlFor="low" className="dark:text-white">Low</Label>
               </div>
             </RadioGroup>
           </div>
           <div>
-            <Label htmlFor="site">Site</Label>
+            <Label htmlFor="site" className="dark:text-white">Site</Label>
             <Select>
-              <SelectTrigger id="site">
+              <SelectTrigger id="site" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select site" />
               </SelectTrigger>
               <SelectContent>
@@ -245,9 +241,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="operationCenter">Operation Center</Label>
+            <Label htmlFor="operationCenter" className="dark:text-white">Operation Center</Label>
             <Select>
-              <SelectTrigger id="operationCenter">
+              <SelectTrigger id="operationCenter" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select operation center" />
               </SelectTrigger>
               <SelectContent>
@@ -258,9 +254,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="facilities">Facilities</Label>
+            <Label htmlFor="facilities" className="dark:text-white">Facilities</Label>
             <Select>
-              <SelectTrigger id="facilities">
+              <SelectTrigger id="facilities" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select facilities" />
               </SelectTrigger>
               <SelectContent>
@@ -271,9 +267,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="unitType">Unit type</Label>
+            <Label htmlFor="unitType" className="dark:text-white">Unit type</Label>
             <Select>
-              <SelectTrigger id="unitType">
+              <SelectTrigger id="unitType" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select unit type" />
               </SelectTrigger>
               <SelectContent>
@@ -284,17 +280,18 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="approvalDate">Approval Date</Label>
-            <Input id="approvalDate" type="date" />
+            <Label htmlFor="approvalDate" className="dark:text-white">Approval Date</Label>
+            <Input id="approvalDate" type="date" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="plannedCompletionDate">Planned completion date</Label>
-            <Input id="plannedCompletionDate" type="date" />
+            
+            <Label htmlFor="plannedCompletionDate" className="dark:text-white">Planned completion date</Label>
+            <Input id="plannedCompletionDate" type="date" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="hazardClass">Hazard Class</Label>
+            <Label htmlFor="hazardClass" className="dark:text-white">Hazard Class</Label>
             <Select>
-              <SelectTrigger id="hazardClass">
+              <SelectTrigger id="hazardClass" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select hazard class" />
               </SelectTrigger>
               <SelectContent>
@@ -305,9 +302,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="assignTo">Assign to</Label>
+            <Label htmlFor="assignTo" className="dark:text-white">Assign to</Label>
             <Select>
-              <SelectTrigger id="assignTo">
+              <SelectTrigger id="assignTo" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
               <SelectContent>
@@ -318,9 +315,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="riskClass">Risk Class</Label>
+            <Label htmlFor="riskClass" className="dark:text-white">Risk Class</Label>
             <Select>
-              <SelectTrigger id="riskClass">
+              <SelectTrigger id="riskClass" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select risk class" />
               </SelectTrigger>
               <SelectContent>
@@ -331,9 +328,9 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="hazardWorkflowStatus">Hazard Workflow status</Label>
+            <Label htmlFor="hazardWorkflowStatus" className="dark:text-white">Hazard Workflow status</Label>
             <Select>
-              <SelectTrigger id="hazardWorkflowStatus">
+              <SelectTrigger id="hazardWorkflowStatus" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select workflow status" />
               </SelectTrigger>
               <SelectContent>
@@ -344,20 +341,19 @@ const HazardManagementScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="comments">Comments</Label>
-            <Textarea id="comments" placeholder="Add additional comments" />
+            <Label htmlFor="comments" className="dark:text-white">Comments</Label>
+            <Textarea id="comments" placeholder="Add additional comments" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="assetList">Asset List</Label>
-            <Input id="assetList" placeholder="Add Asset Id" />
-            <div className="mt-2">
+            <Label htmlFor="assetList" className="dark:text-white">Asset List</Label>
+            <Input id="assetList" placeholder="Add Asset Id" className="dark:bg-gray-700 dark:text-white" />
+            <div className="mt-2 dark:text-white">
               <div>Boiler-01-Kiwana-117</div>
-              
               <div>Milling-08-Kiwana-217</div>
             </div>
           </div>
           <div className="flex justify-end space-x-4">
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="dark:bg-gray-700 dark:text-white">Cancel</Button>
             <Button>Submit</Button>
           </div>
         </div>
@@ -368,46 +364,46 @@ const HazardManagementScreen: React.FC = () => (
 
 const CorrectiveActionScreen: React.FC = () => (
   <div className="space-y-4">
-    <h2 className="text-2xl font-bold">Corrective Actions</h2>
-    <Card>
+    <h2 className="text-2xl font-bold dark:text-white">Corrective Actions</h2>
+    <Card className="dark:bg-gray-800">
       <CardHeader>
-        <CardTitle>Create Corrective Action</CardTitle>
+        <CardTitle className="dark:text-white">Create Corrective Action</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="title">Title</Label>
-            <Input id="title" placeholder="Enter corrective action title" />
+            <Label htmlFor="title" className="dark:text-white">Title</Label>
+            <Input id="title" placeholder="Enter corrective action title" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="correctiveActionId">Corrective Action ID Number</Label>
-            <Input id="correctiveActionId" placeholder="32-CA-1191" />
+            <Label htmlFor="correctiveActionId" className="dark:text-white">Corrective Action ID Number</Label>
+            <Input id="correctiveActionId" placeholder="32-CA-1191" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label>Priority</Label>
+            <Label className="dark:text-white">Priority</Label>
             <RadioGroup defaultValue="medium">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="veryHigh" id="caVeryHigh" />
-                <Label htmlFor="caVeryHigh">Very High</Label>
+                <Label htmlFor="caVeryHigh" className="dark:text-white">Very High</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="high" id="caHigh" />
-                <Label htmlFor="caHigh">High</Label>
+                <Label htmlFor="caHigh" className="dark:text-white">High</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="medium" id="caMedium" />
-                <Label htmlFor="caMedium">Medium</Label>
+                <Label htmlFor="caMedium" className="dark:text-white">Medium</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="low" id="caLow" />
-                <Label htmlFor="caLow">Low</Label>
+                <Label htmlFor="caLow" className="dark:text-white">Low</Label>
               </div>
             </RadioGroup>
           </div>
           <div>
-            <Label htmlFor="caSite">Site</Label>
+            <Label htmlFor="caSite" className="dark:text-white">Site</Label>
             <Select>
-              <SelectTrigger id="caSite">
+              <SelectTrigger id="caSite" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select site" />
               </SelectTrigger>
               <SelectContent>
@@ -418,9 +414,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="caOperationCenter">Operation Center</Label>
+            <Label htmlFor="caOperationCenter" className="dark:text-white">Operation Center</Label>
             <Select>
-              <SelectTrigger id="caOperationCenter">
+              <SelectTrigger id="caOperationCenter" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select operation center" />
               </SelectTrigger>
               <SelectContent>
@@ -431,9 +427,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="caFacilities">Facilities</Label>
+            <Label htmlFor="caFacilities" className="dark:text-white">Facilities</Label>
             <Select>
-              <SelectTrigger id="caFacilities">
+              <SelectTrigger id="caFacilities" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select facilities" />
               </SelectTrigger>
               <SelectContent>
@@ -444,9 +440,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="sources">Sources</Label>
+            <Label htmlFor="sources" className="dark:text-white">Sources</Label>
             <Select>
-              <SelectTrigger id="sources">
+              <SelectTrigger id="sources" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select sources" />
               </SelectTrigger>
               <SelectContent>
@@ -457,17 +453,17 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="plannedCompletion">Planned Completion</Label>
-            <Input id="plannedCompletion" type="date" />
+            <Label htmlFor="plannedCompletion" className="dark:text-white">Planned Completion</Label>
+            <Input id="plannedCompletion" type="date" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="actualCompletion">Actual Completion</Label>
-            <Input id="actualCompletion" type="date" />
+            <Label htmlFor="actualCompletion" className="dark:text-white">Actual Completion</Label>
+            <Input id="actualCompletion" type="date" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="engineeringStandard">Engineering Standard</Label>
+            <Label htmlFor="engineeringStandard" className="dark:text-white">Engineering Standard</Label>
             <Select>
-              <SelectTrigger id="engineeringStandard">
+              <SelectTrigger id="engineeringStandard" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select engineering standard" />
               </SelectTrigger>
               <SelectContent>
@@ -478,9 +474,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="caAssignTo">Assign to</Label>
+            <Label htmlFor="caAssignTo" className="dark:text-white">Assign to</Label>
             <Select>
-              <SelectTrigger id="caAssignTo">
+              <SelectTrigger id="caAssignTo" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
               <SelectContent>
@@ -491,9 +487,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="regionalAssetIntegrityEngineer">Regional Asset Integrity Engineer</Label>
+            <Label htmlFor="regionalAssetIntegrityEngineer" className="dark:text-white">Regional Asset Integrity Engineer</Label>
             <Select>
-              <SelectTrigger id="regionalAssetIntegrityEngineer">
+              <SelectTrigger id="regionalAssetIntegrityEngineer" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select engineer" />
               </SelectTrigger>
               <SelectContent>
@@ -504,9 +500,9 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="maintenanceReliabilityEngineer">Maintenance and Reliability Engineer</Label>
+            <Label htmlFor="maintenanceReliabilityEngineer" className="dark:text-white">Maintenance and Reliability Engineer</Label>
             <Select>
-              <SelectTrigger id="maintenanceReliabilityEngineer">
+              <SelectTrigger id="maintenanceReliabilityEngineer" className="dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select engineer" />
               </SelectTrigger>
               <SelectContent>
@@ -517,27 +513,27 @@ const CorrectiveActionScreen: React.FC = () => (
             </Select>
           </div>
           <div>
-            <Label htmlFor="caComments">Comments</Label>
-            <Textarea id="caComments" placeholder="Add additional comments" />
+            <Label htmlFor="caComments" className="dark:text-white">Comments</Label>
+            <Textarea id="caComments" placeholder="Add additional comments" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="purchaseOrder">Purchase Order</Label>
-            <Input id="purchaseOrder" placeholder="Search purchase order" />
+            <Label htmlFor="purchaseOrder" className="dark:text-white">Purchase Order</Label>
+            <Input id="purchaseOrder" placeholder="Search purchase order" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="workOrder">Work Order</Label>
-            <Input id="workOrder" placeholder="Search work order" />
+            <Label htmlFor="workOrder" className="dark:text-white">Work Order</Label>
+            <Input id="workOrder" placeholder="Search work order" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="capitalProjectId">Capital Project ID</Label>
-            <Input id="capitalProjectId" placeholder="Search project ID" />
+            <Label htmlFor="capitalProjectId" className="dark:text-white">Capital Project ID</Label>
+            <Input id="capitalProjectId" placeholder="Search project ID" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label htmlFor="hazardManagementId">Hazard Management ID number</Label>
-            <Input id="hazardManagementId" placeholder="Search hazard management ID" />
+            <Label htmlFor="hazardManagementId" className="dark:text-white">Hazard Management ID number</Label>
+            <Input id="hazardManagementId" placeholder="Search hazard management ID" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div className="flex justify-end space-x-4">
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="dark:bg-gray-700 dark:text-white">Cancel</Button>
             <Button>Submit</Button>
           </div>
         </div>
@@ -551,6 +547,7 @@ export default function Dashboard() {
   const [language, setLanguage] = useState("Eng (US)")
   const [activeScreen, setActiveScreen] = useState("dashboard")
   const [isMobile, setIsMobile] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -566,6 +563,10 @@ export default function Dashboard() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode)
+  }, [isDarkMode])
+
   const getBreadcrumbs = () => {
     switch (activeScreen) {
       case "hazard":
@@ -578,22 +579,20 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
-        sidebarCollapsed ? '-translate-x-full md:translate-x-0 md:w-16' : 'translate-x-0 w-64'
-      } bg-indigo-600 overflow-y-auto`}>
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4">
-            <div className={`rounded-lg bg-white p-2 ${sidebarCollapsed ? 'mx-auto' : 'mr-2'}`}>
-              <span className="text-indigo-600 font-bold">CY</span>
+    <TooltipProvider>
+      <div className={`flex h-screen ${isDarkMode ? 'dark' : ''}`}>
+        {/* Sidebar */}
+        <aside className={`flex flex-col bg-indigo-600 dark:bg-gray-800 p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
+          <div className="flex items-center mb-8 justify-between">
+            <div className={`rounded-lg bg-white dark:bg-gray-700 p-2 ${sidebarCollapsed ? 'mr-0' : 'mr-2'}`}>
+              <span className="text-indigo-600 dark:text-white font-bold">CY</span>
             </div>
             {!sidebarCollapsed && <span className="text-2xl font-bold text-white">CYIENT</span>}
-            <Button variant="ghost" size="sm" className="text-white md:hidden" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
+            <Button variant="ghost" size="sm" className="text-white" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
               <Menu className="h-4 w-4" />
             </Button>
           </div>
-          <nav className="space-y-2 flex-grow p-4">
+          <nav className="space-y-2 flex-grow">
             <SidebarItem icon={LayoutDashboard} onClick={() => setActiveScreen("dashboard")} active={activeScreen === "dashboard"} collapsed={sidebarCollapsed}>Dashboard</SidebarItem>
             <SidebarItem icon={Home} onClick={() => setActiveScreen("home")} active={activeScreen === "home"} collapsed={sidebarCollapsed}>Home</SidebarItem>
             <SidebarItem icon={AlertTriangle} onClick={() => setActiveScreen("hazard")} active={activeScreen === "hazard"} collapsed={sidebarCollapsed}>Hazard Management</SidebarItem>
@@ -601,229 +600,251 @@ export default function Dashboard() {
             <SidebarItem icon={MessageSquare} onClick={() => setActiveScreen("messages")} active={activeScreen === "messages"} collapsed={sidebarCollapsed}>Messages</SidebarItem>
             <SidebarItem icon={Settings} onClick={() => setActiveScreen("settings")} active={activeScreen === "settings"} collapsed={sidebarCollapsed}>Settings</SidebarItem>
           </nav>
-          <SidebarItem icon={LogOut} onClick={() => {}} active={false} collapsed={sidebarCollapsed}>Sign Out</SidebarItem>
-        </div>
-      </aside>
+          <SidebarItem icon={LogOut} onClick={() => console.log("Sign Out")} active={false} collapsed={sidebarCollapsed}>Sign Out</SidebarItem>
+        </aside>
 
-      {/* Main content */}
-      <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'}`}>
-        {/* Header */}
-        <header className="bg-white border-b p-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <Button variant="ghost" size="sm" className="md:hidden mr-2" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
-              <Menu className="h-4 w-4" />
-            </Button>
-            <span className="text-xl font-semibold">Dashboard</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Input type="search" placeholder="Search here..." className="w-64 mr-4" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
-                  {language} <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setLanguage("Eng (US)")}>Eng (US)</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setLanguage("Spanish (ES)")}>Spanish (ES)</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {testData.notifications.map((notification, index) => (
-                  <DropdownMenuItem key={index}>{notification}</DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </div>
-        </header>
-
-        {/* Dashboard content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white p-4 md:p-6">
-          <Breadcrumbs items={getBreadcrumbs()} />
-          {activeScreen === "dashboard" && (
-            <>
-              <h2 className="text-2xl font-bold mb-6">Hazard Status</h2>
-              {/* Today's Status */}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
-                <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
-                <StatusCard title="Elapsed" value="456" change="+9%" color="yellow" icon={Clock} />
-                <StatusCard title="Complete" value="29" change="+3%" color="green" icon={CheckCircle} />
-                <StatusCard title="Incomplete" value="8" change="0.5%" color="purple" icon={XCircle} />
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
+          {/* Header */}
+          <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+            <div className="flex items-center">
+              <span className="text-xl font-semibold dark:text-white">Dashboard</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Input type="search" placeholder="Search here..." className="w-64 mr-4 dark:bg-gray-700 dark:text-white" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost">
+                    {language} <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setLanguage("Eng (US)")}>Eng (US)</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setLanguage("Spanish (ES)")}>Spanish (ES)</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {testData.notifications.map((notification, index) => (
+                    <DropdownMenuItem key={index}>{notification}</DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="flex items-center space-x-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Light mode</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Switch
+                  id="theme-toggle"
+                  checked={isDarkMode}
+                  onCheckedChange={setIsDarkMode}
+                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Dark mode</p>
+                  </TooltipContent>
+                </Tooltip>
+                <span className="sr-only">Toggle theme</span>
               </div>
-              <h2 className="text-2xl font-bold mb-6">Corrective Action Status</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
-                <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
-                <StatusCard title="Elapsed" value="728" change="+5%" color="yellow" icon={Clock} />
-                <StatusCard title="Complete" value="345" change="+12%" color="green" icon={CheckCircle} />
-                <StatusCard title="Incomplete" value="110" change="0.5%" color="purple" icon={XCircle} />
-              </div>
-              {/* Charts */}
-              <div className="grid gap-4 md:grid-cols-2 mb-8">
-                <ChartCard title="Hazard Management Insights 2024">
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={testData.hazardInsightsData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                        <XAxis dataKey="name" stroke="#333" />
-                        <YAxis stroke="#333" />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="Low" stroke="#10b981" />
-                        <Line type="monotone" dataKey="Medium" stroke="#8b5cf6" />
-                        <Line type="monotone" dataKey="High" stroke="#ef4444" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </ChartCard>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </div>
+          </header>
 
-                <ChartCard title="Hazard & Corrective Actions Resolved">
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={testData.actionsResolvedData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                        <XAxis dataKey="name" stroke="#333" />
-                        <YAxis stroke="#333" />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="Hazard" fill="#14b8a6" />
-                        <Bar dataKey="Corrective Actions" fill="#fbbf24" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </ChartCard>
-              </div>
+          {/* Dashboard content */}
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white dark:bg-gray-900 p-6">
+            <Breadcrumbs items={getBreadcrumbs()} />
+            {activeScreen === "dashboard" && (
+              <>
+                <h2 className="text-2xl font-bold mb-6 dark:text-white">Hazard Status</h2>
+                {/* Today's Status */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
+                  <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
+                  <StatusCard title="Elapsed" value="456" change="+9%" color="yellow" icon={Clock} />
+                  <StatusCard title="Complete" value="29" change="+3%" color="green" icon={CheckCircle} />
+                  <StatusCard title="Incomplete" value="8" change="0.5%" color="purple" icon={XCircle} />
+                </div>
+                <h2 className="text-2xl font-bold mb-6 dark:text-white">Corrective Action Status</h2>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
+                  <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
+                  <StatusCard title="Elapsed" value="728" change="+5%" color="yellow" icon={Clock} />
+                  <StatusCard title="Complete" value="345" change="+12%" color="green" icon={CheckCircle} />
+                  <StatusCard title="Incomplete" value="110" change="0.5%" color="purple" icon={XCircle} />
+                </div>
+                {/* Charts */}
+                <div className="grid gap-4 md:grid-cols-2 mb-8">
+                  <ChartCard title="Hazard Management Insights 2024">
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={testData.hazardInsightsData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#4a5568" : "#e5e5e5"} />
+                          <XAxis dataKey="name" stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <YAxis stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <RechartsTooltip contentStyle={isDarkMode ? { backgroundColor: '#2d3748', border: 'none' } : {}} />
+                          <Legend />
+                          <Line type="monotone" dataKey="Low" stroke="#10b981" />
+                          <Line type="monotone" dataKey="Medium" stroke="#8b5cf6" />
+                          <Line type="monotone" dataKey="High" stroke="#ef4444" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </ChartCard>
 
-              {/* Top 7 Major Hazards Overdue */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Top 7 Major Hazards Overdue</CardTitle>
-                </CardHeader>
-                <CardContent className="max-h-[300px] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Progress</TableHead>
-                        <TableHead>Complete %</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {testData.topHazardsData.map((hazard, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{hazard.name}</TableCell>
-                          <TableCell>
+                  <ChartCard title="Hazard & Corrective Actions Resolved">
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={testData.actionsResolvedData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#4a5568" : "#e5e5e5"} />
+                          <XAxis dataKey="name" stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <YAxis stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <RechartsTooltip contentStyle={isDarkMode ? { backgroundColor: '#2d3748', border: 'none' } : {}} />
+                          <Legend />
+                          <Bar dataKey="Hazard" fill="#14b8a6" />
+                          <Bar dataKey="Corrective Actions" fill="#fbbf24" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </ChartCard>
+                </div>
+
+                {/* Top 7 Major Hazards Overdue */}
+                <Card className="mb-8 dark:bg-gray-800">
+                  <CardHeader>
+                    <CardTitle className="dark:text-white">Top 7 Major Hazards Overdue</CardTitle>
+                  </CardHeader>
+                  <CardContent className="max-h-[300px] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="dark:text-gray-400">Name</TableHead>
+                          <TableHead className="dark:text-gray-400">Progress</TableHead>
+                          <TableHead className="dark:text-gray-400">Complete %</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {testData.topHazardsData.map((hazard, i) => (
+                          <TableRow key={i}>
+                            <TableCell className="dark:text-white">{hazard.name}</TableCell>
+                            <TableCell>
                             <div className="w-[60%] bg-gray-200 rounded-full h-2">
                               <div
                                 className="bg-blue-500 h-2 rounded-full"
                                 style={{ width: `${hazard.progress}%` }}
                               ></div>
                             </div>
-                          </TableCell>
-                          <TableCell>{hazard.progress}%</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+                            </TableCell>
+                            <TableCell className="dark:text-white">{hazard.progress}%</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
 
-              {/* Corrective Action Trend by Region and Risks */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <ChartCard title="Corrective Action Trend by Region">
-                  <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                  <ResponsiveChoropleth
-                        data={testData.choroplethData}
-                        features={testData.geoData}
-                        margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-                        colors={testData.colorScale}
-                        domain={[0, 1000]}
-                        unknownColor="#ffffff"
-                        label="properties.name"
-                        valueFormat=".0f"
-                        projectionScale={100}
-                        projectionTranslation={[0.5, 0.7]}
-                        projectionRotation={[0, 0, 0]}
-                        enableGraticule={false}
-                        borderWidth={1.0}
-                        borderColor="#000000"
-                        tooltip={({ feature }: { feature: Feature }) => {
-                          const countryData = testData.choroplethData.find(d => d.id === feature.id)
-                          if (countryData) {
-                            return (
-                              <div
-                                style={{
-                                  background: 'white',
-                                  padding: '9px 12px',
-                                  border: '1px solid #ccc',
-                                }}
-                              >
-                                <strong>{feature.properties?.name}</strong>
-                                <br />
-                                No of CAs: {countryData.value}
-                              </div>
-                            )
-                          }
-                          return null
-                        }}
-                        theme={{
-                          background: "#ffffff",
-                          text: {
-                            fontSize: 11,
-                            fill: "#333333",
-                            outlineWidth: 0,
-                            outlineColor: "transparent",
-                          },
-                        }}                       
-                      />
-                </ResponsiveContainer>
-                  </div>
-                </ChartCard>
+                {/* Corrective Action Trend by Region and Risks */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <ChartCard title="Corrective Action Trend by Region">
+                    <div className="h-[400px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveChoropleth
+                          data={testData.choroplethData}
+                          features={testData.geoData}
+                          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                          colors={testData.colorScale}
+                          domain={[0, 1000]}
+                          unknownColor="#ffffff"
+                          label="properties.name"
+                          valueFormat=".0f"
+                          projectionScale={100}
+                          projectionTranslation={[0.5, 0.7]}
+                          projectionRotation={[0, 0, 0]}
+                          enableGraticule={false}
+                          borderWidth={1.0}
+                          borderColor="#000000"
+                          tooltip={({ feature }: { feature: Feature }) => {
+                            const countryData = testData.choroplethData.find(d => d.id === feature.id)
+                            if (countryData) {
+                              return (
+                                <div
+                                  style={{
+                                    background: isDarkMode ? '#2d3748' : 'white',
+                                    color: isDarkMode ? 'white' : 'black',
+                                    padding: '9px 12px',
+                                    border: '1px solid #ccc',
+                                  }}
+                                >
+                                  <strong>{feature.properties?.name}</strong>
+                                  <br />
+                                  No of CAs: {countryData.value}
+                                </div>
+                              )
+                            }
+                            return null
+                          }}
+                          theme={{
+                            background: isDarkMode ? "#1a202c" : "#ffffff",
+                            text: {
+                              fontSize: 11,
+                              fill: isDarkMode ? "#e2e8f0" : "#333333",
+                              outlineWidth: 0,
+                              outlineColor: "transparent",
+                            },
+                          }}                       
+                        />
+                      </ResponsiveContainer>
+                    </div>
+                  </ChartCard>
 
-                <ChartCard title="Risks">
-                  <div className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={testData.risksData2024}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="High" stackId="a" fill="#ef4444" />
-                        <Bar dataKey="VeryHigh" stackId="a" fill="#ec4899" />
-                        <Line type="monotone" dataKey="mitigated" stroke="#f59e0b" strokeWidth={2} />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="flex justify-center mt-4 space-x-8">
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 bg-[#ef4444] mr-2"></div>
-                      <span>High: 1,135</span>
+                  <ChartCard title="Risks">
+                    <div className="h-[400px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={testData.risksData2024}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#4a5568" : "#e5e5e5"} />
+                          <XAxis dataKey="month" stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <YAxis stroke={isDarkMode ? "#a0aec0" : "#333"} />
+                          <RechartsTooltip contentStyle={isDarkMode ? { backgroundColor: '#2d3748', border: 'none' } : {}} />
+                          <Legend />
+                          <Bar dataKey="High" stackId="a" fill="#ef4444" />
+                          <Bar dataKey="VeryHigh" stackId="a" fill="#ec4899" />
+                          <Line type="monotone" dataKey="mitigated" stroke="#f59e0b" strokeWidth={2} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
                     </div>
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 bg-[#ec4899] mr-2"></div>
-                      <span>Very High: 970</span>
+                    <div className="flex justify-center mt-4 space-x-8">
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 bg-[#ef4444] mr-2"></div>
+                        <span className="dark:text-white">High: 1,135</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 bg-[#ec4899] mr-2"></div>
+                        <span className="dark:text-white">Very High: 970</span>
+                      </div>
                     </div>
-                  </div>
-                </ChartCard>
-              </div>
-            </>
-          )}
-          {activeScreen === "hazard" && <HazardManagementScreen />}
-          {activeScreen === "corrective" && <CorrectiveActionScreen />}
-        </main>
+                  </ChartCard>
+                </div>
+              </>
+            )}
+            {activeScreen === "hazard" && <HazardManagementScreen />}
+            {activeScreen === "corrective" && <CorrectiveActionScreen />}
+          </main>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
