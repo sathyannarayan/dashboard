@@ -98,7 +98,7 @@ const generateTestData = () => {
   .domain([1])
   .range(["#FFFFFF", "#3357FF"])
 
-  const features: Feature[] = (worldCountries as FeatureCollection).features;
+  const geoData: Feature[] = (worldCountries as FeatureCollection).features;
 
   return {
     notifications,
@@ -109,7 +109,7 @@ const generateTestData = () => {
     sampleDropdownData,
     choroplethData,
     colorScale,
-    features,
+    geoData,
   };
 };
 
@@ -745,7 +745,7 @@ export default function Dashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                   <ResponsiveChoropleth
                         data={testData.choroplethData}
-                        features={testData.features}
+                        features={testData.geoData}
                         margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                         colors={testData.colorScale}
                         domain={[0, 1000]}
