@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
 import { Input } from "./components/ui/input"
 import { Button } from "./components/ui/button"
@@ -26,11 +26,6 @@ import { Feature, FeatureCollection } from 'geojson'
 import { scaleThreshold } from 'd3-scale'
 import worldCountries from './components/ui/geofeatures.json'
 
-interface ChoroplethData {
-  id: string
-  value: number
-}
-
 // Test data generation
 const generateTestData = () => {
   const notifications = [
@@ -53,13 +48,13 @@ const generateTestData = () => {
   }));
 
   const topHazardsData = [
-    { name: "[AUS][WA]Pasta Plant heat exchanger", progress: 45, color: "#84b1f9" },
-    { name: "[SA][PA]Evaporator unit spillage", progress: 57, color: "#84b1f9" },
-    { name: "[CA][BC]Boiler feed system Rupture", progress: 68, color: "#84b1f9" },
-    { name: "[KY][TX]Mining feeder Electrical", progress: 79, color: "#84b1f9" },
-    { name: "[NY][NJ]Cooling tower fan failure", progress: 82, color: "#84b1f9" },
-    { name: "[UK][LN]Chemical storage tank leak", progress: 62, color: "#84b1f9" },
-    { name: "[JP][TK]Conveyor belt malfunction", progress: 55, color: "#84b1f9" },
+    { name: "[AUS][WA]Pasta Plant heat exchanger", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[SA][PA]Evaporator unit spillage", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[CA][BC]Boiler feed system Rupture", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[KY][TX]Mining feeder Electrical", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[NY][NJ]Cooling tower fan failure", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[UK][LN]Chemical storage tank leak", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
+    { name: "[JP][TK]Conveyor belt malfunction", progress: Math.floor(Math.random() * 68) + 30, color: "#84b1f9" },
   ];
 
   const risksData2024 = Array.from({ length: 12 }, (_, i) => ({
@@ -82,12 +77,12 @@ const generateTestData = () => {
     engineers: ["John Smith", "Jane Smith", "Bob Johnson", "Alice Brown"],
   };
 
-  const choroplethData: ChoroplethData[] = [
-    { id: "CAN", value: 942 },
-    { id: "AUS", value: 934 },
-    { id: "BRA", value: 936 },
-    { id: "PER", value: 487 },
-    { id: "RUS", value: 456 },
+  const choroplethData = [
+    { id: "CAN", value: Math.floor(Math.random() * 400) + 600 },
+    { id: "AUS", value: Math.floor(Math.random() * 400) + 600 },
+    { id: "BRA", value: Math.floor(Math.random() * 400) + 600 },
+    { id: "PER", value: Math.floor(Math.random() * 400) + 600 },
+    { id: "RUS", value: Math.floor(Math.random() * 400) + 600 },
   ];
 
   const colorScale = scaleThreshold<number, string>()
@@ -95,6 +90,20 @@ const generateTestData = () => {
     .range(["#FFFFFF", "#3357FF"])
 
   const geoData: Feature[] = (worldCountries as FeatureCollection).features;
+
+  const hazardStatus = [
+    { title: "Due to expire 30 days", value: Math.floor(Math.random() * 100).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "red" as const, icon: AlertCircle },
+    { title: "Elapsed", value: Math.floor(Math.random() * 1000).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "yellow" as const, icon: Clock },
+    { title: "Complete", value: Math.floor(Math.random() * 100).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "green" as const, icon: CheckCircle },
+    { title: "Incomplete", value: Math.floor(Math.random() * 50).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "purple" as const, icon: XCircle },
+  ];
+
+  const correctiveActionStatus = [
+    { title: "Due to expire 30 days", value: Math.floor(Math.random() * 100).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "red" as const, icon: AlertCircle },
+    { title: "Elapsed", value: Math.floor(Math.random() * 1000).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "yellow" as const, icon: Clock },
+    { title: "Complete", value: Math.floor(Math.random() * 500).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "green" as const, icon: CheckCircle },
+    { title: "Incomplete", value: Math.floor(Math.random() * 200).toString(), change: `${Math.floor(Math.random() * 10)}%`, color: "purple" as const, icon: XCircle },
+  ];
 
   return {
     notifications,
@@ -106,10 +115,15 @@ const generateTestData = () => {
     choroplethData,
     colorScale,
     geoData,
+    hazardStatus,
+    correctiveActionStatus,
   };
 };
 
-const testData = generateTestData();
+interface ChoroplethData {
+  id: string
+  value: number
+}
 
 interface StatusCardProps {
   title: string;
@@ -189,7 +203,7 @@ const ChartCard: React.FC<{ title: string; children: React.ReactNode }> = ({ tit
   </Card>
 )
 
-const HazardManagementScreen: React.FC = () => (
+const HazardManagementScreen: React.FC<{ sampleDropdownData: any }> = ({ sampleDropdownData }) => (
   <div className="space-y-4">
     <h2 className="text-2xl font-bold dark:text-white">Hazard Management</h2>
     <Card className="dark:bg-gray-800">
@@ -234,7 +248,8 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select site" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.sites.map((site) => (
+                
+                {sampleDropdownData.sites.map((site: string) => (
                   <SelectItem key={site} value={site}>{site}</SelectItem>
                 ))}
               </SelectContent>
@@ -247,7 +262,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select operation center" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.operationCenters.map((center) => (
+                {sampleDropdownData.operationCenters.map((center: string) => (
                   <SelectItem key={center} value={center}>{center}</SelectItem>
                 ))}
               </SelectContent>
@@ -260,7 +275,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select facilities" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.facilities.map((facility) => (
+                {sampleDropdownData.facilities.map((facility: string) => (
                   <SelectItem key={facility} value={facility}>{facility}</SelectItem>
                 ))}
               </SelectContent>
@@ -273,7 +288,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select unit type" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.unitTypes.map((type) => (
+                {sampleDropdownData.unitTypes.map((type: string) => (
                   <SelectItem key={type} value={type}>{type}</SelectItem>
                 ))}
               </SelectContent>
@@ -284,9 +299,8 @@ const HazardManagementScreen: React.FC = () => (
             <Input id="approvalDate" type="date" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            
             <Label htmlFor="plannedCompletionDate" className="dark:text-white">Planned completion date</Label>
-            <Input id="plannedCompletionDate" type="date" className="dark:bg-gray-700 dark:text-white" />
+            <Input id="plannedCompletionDate" type="date" className="dark:bg-gray-700  dark:text-white" />
           </div>
           <div>
             <Label htmlFor="hazardClass" className="dark:text-white">Hazard Class</Label>
@@ -295,7 +309,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select hazard class" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.hazardClasses.map((hazardClass) => (
+                {sampleDropdownData.hazardClasses.map((hazardClass: string) => (
                   <SelectItem key={hazardClass} value={hazardClass}>{hazardClass}</SelectItem>
                 ))}
               </SelectContent>
@@ -308,7 +322,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.engineers.map((engineer) => (
+                {sampleDropdownData.engineers.map((engineer: string) => (
                   <SelectItem key={engineer} value={engineer}>{engineer}</SelectItem>
                 ))}
               </SelectContent>
@@ -321,7 +335,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select risk class" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.riskClasses.map((riskClass) => (
+                {sampleDropdownData.riskClasses.map((riskClass: string) => (
                   <SelectItem key={riskClass} value={riskClass}>{riskClass}</SelectItem>
                 ))}
               </SelectContent>
@@ -334,7 +348,7 @@ const HazardManagementScreen: React.FC = () => (
                 <SelectValue placeholder="Select workflow status" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.workflowStatuses.map((status) => (
+                {sampleDropdownData.workflowStatuses.map((status: string) => (
                   <SelectItem key={status} value={status}>{status}</SelectItem>
                 ))}
               </SelectContent>
@@ -362,7 +376,7 @@ const HazardManagementScreen: React.FC = () => (
   </div>
 )
 
-const CorrectiveActionScreen: React.FC = () => (
+const CorrectiveActionScreen: React.FC<{ sampleDropdownData: any }> = ({ sampleDropdownData }) => (
   <div className="space-y-4">
     <h2 className="text-2xl font-bold dark:text-white">Corrective Actions</h2>
     <Card className="dark:bg-gray-800">
@@ -380,7 +394,7 @@ const CorrectiveActionScreen: React.FC = () => (
             <Input id="correctiveActionId" placeholder="32-CA-1191" className="dark:bg-gray-700 dark:text-white" />
           </div>
           <div>
-            <Label className="dark:text-white">Priority</Label>
+            <Label  className="dark:text-white">Priority</Label>
             <RadioGroup defaultValue="medium">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="veryHigh" id="caVeryHigh" />
@@ -407,7 +421,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select site" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.sites.map((site) => (
+                {sampleDropdownData.sites.map((site: string) => (
                   <SelectItem key={site} value={site}>{site}</SelectItem>
                 ))}
               </SelectContent>
@@ -420,7 +434,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select operation center" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.operationCenters.map((center) => (
+                {sampleDropdownData.operationCenters.map((center: string) => (
                   <SelectItem key={center} value={center}>{center}</SelectItem>
                 ))}
               </SelectContent>
@@ -433,7 +447,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select facilities" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.facilities.map((facility) => (
+                {sampleDropdownData.facilities.map((facility: string) => (
                   <SelectItem key={facility} value={facility}>{facility}</SelectItem>
                 ))}
               </SelectContent>
@@ -446,7 +460,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select sources" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.sources.map((source) => (
+                {sampleDropdownData.sources.map((source: string) => (
                   <SelectItem key={source} value={source}>{source}</SelectItem>
                 ))}
               </SelectContent>
@@ -467,7 +481,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select engineering standard" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.engineeringStandards.map((standard) => (
+                {sampleDropdownData.engineeringStandards.map((standard: string) => (
                   <SelectItem key={standard} value={standard}>{standard}</SelectItem>
                 ))}
               </SelectContent>
@@ -480,7 +494,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.engineers.map((engineer) => (
+                {sampleDropdownData.engineers.map((engineer: string) => (
                   <SelectItem key={engineer} value={engineer}>{engineer}</SelectItem>
                 ))}
               </SelectContent>
@@ -493,7 +507,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select engineer" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.engineers.map((engineer) => (
+                {sampleDropdownData.engineers.map((engineer: string) => (
                   <SelectItem key={engineer} value={engineer}>{engineer}</SelectItem>
                 ))}
               </SelectContent>
@@ -506,7 +520,7 @@ const CorrectiveActionScreen: React.FC = () => (
                 <SelectValue placeholder="Select engineer" />
               </SelectTrigger>
               <SelectContent>
-                {testData.sampleDropdownData.engineers.map((engineer) => (
+                {sampleDropdownData.engineers.map((engineer: string) => (
                   <SelectItem key={engineer} value={engineer}>{engineer}</SelectItem>
                 ))}
               </SelectContent>
@@ -542,12 +556,63 @@ const CorrectiveActionScreen: React.FC = () => (
   </div>
 )
 
+const SettingsScreen: React.FC<{
+  refreshInterval: number;
+  setRefreshInterval: (interval: number) => void;
+}> = ({ refreshInterval, setRefreshInterval }) => {
+  const [tempInterval, setTempInterval] = useState(refreshInterval.toString())
+
+  const handleSave = () => {
+    const newInterval = parseInt(tempInterval, 10)
+    if (!isNaN(newInterval) && newInterval > 0) {
+      setRefreshInterval(newInterval)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold dark:text-white">Settings</h2>
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Dashboard Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="refreshInterval" className="dark:text-white">Refresh Interval (seconds)</Label>
+              <Input
+                id="refreshInterval"
+                type="number"
+                value={tempInterval}
+                onChange={(e) => setTempInterval(e.target.value)}
+                className="dark:bg-gray-700 dark:text-white mt-1"
+              />
+            </div>
+            <Button onClick={handleSave}>Save</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [language, setLanguage] = useState("Eng (US)")
   const [activeScreen, setActiveScreen] = useState("dashboard")
   const [isMobile, setIsMobile] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [refreshInterval, setRefreshInterval] = useState(5)
+  const [testData, setTestData] = useState<ReturnType<typeof generateTestData> | null>(null)
+
+  const regenerateTestData = useCallback(() => {
+    setTestData(generateTestData())
+  }, [])
+
+  useEffect(() => {
+    // Generate initial test data on the client side
+    regenerateTestData()
+  }, [regenerateTestData])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -567,15 +632,30 @@ export default function Dashboard() {
     document.documentElement.classList.toggle('dark', isDarkMode)
   }, [isDarkMode])
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      regenerateTestData()
+    }, refreshInterval * 1000)
+
+    return () => clearInterval(intervalId)
+  }, [refreshInterval, regenerateTestData])
+
   const getBreadcrumbs = () => {
     switch (activeScreen) {
       case "hazard":
         return ["Home", "Hazard Management"]
       case "corrective":
         return ["Home", "Corrective Actions"]
+      case "settings":
+        return ["Home", "Settings"]
       default:
         return ["Home", "Dashboard"]
     }
+  }
+
+  // Add a loading state while waiting for client-side data generation
+  if (!testData) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -631,7 +711,7 @@ export default function Dashboard() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {testData.notifications.map((notification, index) => (
+                  {testData.notifications.map((notification: string, index: number) => (
                     <DropdownMenuItem key={index}>{notification}</DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -675,17 +755,15 @@ export default function Dashboard() {
                 <h2 className="text-2xl font-bold mb-6 dark:text-white">Hazard Status</h2>
                 {/* Today's Status */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
-                  <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
-                  <StatusCard title="Elapsed" value="456" change="+9%" color="yellow" icon={Clock} />
-                  <StatusCard title="Complete" value="29" change="+3%" color="green" icon={CheckCircle} />
-                  <StatusCard title="Incomplete" value="8" change="0.5%" color="purple" icon={XCircle} />
+                  {testData.hazardStatus.map((status, index) => (
+                    <StatusCard key={index} {...status} />
+                  ))}
                 </div>
                 <h2 className="text-2xl font-bold mb-6 dark:text-white">Corrective Action Status</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">            
-                  <StatusCard title="Due to expire 30 days" value="39" change="+5%" color="red" icon={AlertCircle} />
-                  <StatusCard title="Elapsed" value="728" change="+5%" color="yellow" icon={Clock} />
-                  <StatusCard title="Complete" value="345" change="+12%" color="green" icon={CheckCircle} />
-                  <StatusCard title="Incomplete" value="110" change="0.5%" color="purple" icon={XCircle} />
+                  {testData.correctiveActionStatus.map((status, index) => (
+                    <StatusCard key={index} {...status} />
+                  ))}
                 </div>
                 {/* Charts */}
                 <div className="grid gap-4 md:grid-cols-2 mb-8">
@@ -742,12 +820,12 @@ export default function Dashboard() {
                           <TableRow key={i}>
                             <TableCell className="dark:text-white">{hazard.name}</TableCell>
                             <TableCell>
-                            <div className="w-[60%] bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-blue-500 h-2 rounded-full"
-                                style={{ width: `${hazard.progress}%` }}
-                              ></div>
-                            </div>
+                              <div className="w-[60%] bg-gray-200 rounded-full h-2">
+                                <div
+                                  className="bg-blue-500 h-2 rounded-full"
+                                  style={{ width: `${hazard.progress}%` }}
+                                ></div>
+                              </div>
                             </TableCell>
                             <TableCell className="dark:text-white">{hazard.progress}%</TableCell>
                           </TableRow>
@@ -801,47 +879,41 @@ export default function Dashboard() {
                             background: isDarkMode ? "#1a202c" : "#ffffff",
                             text: {
                               fontSize: 11,
-                              fill: isDarkMode ? "#e2e8f0" : "#333333",
-                              outlineWidth: 0,
-                              outlineColor: "transparent",
+                              fill: isDarkMode ? "#a0aec0" : "#333333",
                             },
-                          }}                       
+                          }}
                         />
                       </ResponsiveContainer>
                     </div>
                   </ChartCard>
 
-                  <ChartCard title="Risks">
+                  <ChartCard title="Risks 2024">
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={testData.risksData2024}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#4a5568" : "#e5e5e5"} />
+                          <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#4a5568" : "#e5e5e5"} />
                           <XAxis dataKey="month" stroke={isDarkMode ? "#a0aec0" : "#333"} />
                           <YAxis stroke={isDarkMode ? "#a0aec0" : "#333"} />
                           <RechartsTooltip contentStyle={isDarkMode ? { backgroundColor: '#2d3748', border: 'none' } : {}} />
                           <Legend />
-                          <Bar dataKey="High" stackId="a" fill="#ef4444" />
-                          <Bar dataKey="VeryHigh" stackId="a" fill="#ec4899" />
-                          <Line type="monotone" dataKey="mitigated" stroke="#f59e0b" strokeWidth={2} />
+                          <Bar dataKey="High" fill="#ef4444" />
+                          <Bar dataKey="VeryHigh" fill="#f97316" />
+                          <Line type="monotone" dataKey="mitigated" stroke="#10b981" />
                         </ComposedChart>
                       </ResponsiveContainer>
-                    </div>
-                    <div className="flex justify-center mt-4 space-x-8">
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 bg-[#ef4444] mr-2"></div>
-                        <span className="dark:text-white">High: 1,135</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 bg-[#ec4899] mr-2"></div>
-                        <span className="dark:text-white">Very High: 970</span>
-                      </div>
                     </div>
                   </ChartCard>
                 </div>
               </>
             )}
-            {activeScreen === "hazard" && <HazardManagementScreen />}
-            {activeScreen === "corrective" && <CorrectiveActionScreen />}
+            {activeScreen === "hazard" && <HazardManagementScreen sampleDropdownData={testData.sampleDropdownData} />}
+            {activeScreen === "corrective" && <CorrectiveActionScreen sampleDropdownData={testData.sampleDropdownData} />}
+            {activeScreen === "settings" && (
+              <SettingsScreen
+                refreshInterval={refreshInterval}
+                setRefreshInterval={setRefreshInterval}
+              />
+            )}
           </main>
         </div>
       </div>
