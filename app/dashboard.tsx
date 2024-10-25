@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar"
 import { Progress } from "./components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts'
-import { Bell, Search, ChevronDown, Home, LayoutDashboard, AlertTriangle, CheckSquare, MessageSquare, Settings, LogOut, AlertCircle, Clock, CheckCircle, XCircle, Menu, ChevronRight, Sun, Moon } from 'lucide-react'
+import { Bell, AlertOctagon, Search, ChevronDown, Home, LayoutDashboard, AlertTriangle, CheckSquare, MessageSquare, Settings, LogOut, AlertCircle, Clock, CheckCircle, XCircle, Menu, ChevronRight, Sun, Moon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,7 +61,7 @@ const generateTestData = () => {
     month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
     High: Math.floor(Math.random() * 200) + 100,
     VeryHigh: Math.floor(Math.random() * 200) + 100,
-    mitigated: Math.floor(Math.random() * 300) + 100,
+    mitigated: Math.floor(Math.random() * 100) + 100,
   }));
 
   const sampleDropdownData = {
@@ -75,6 +75,22 @@ const generateTestData = () => {
     engineeringStandards: ["Standard 1", "Standard 2", "Standard 3"],
     sources: ["Source A", "Source B", "Source C"],
     engineers: ["John Smith", "Jane Smith", "Bob Johnson", "Alice Brown"],
+
+     // New data for Risk Management screen
+     riskCategories: ["Strategic", "Operational", "Financial", "Compliance", "Reputational"],
+     riskLikelihoods: ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"],
+     riskConsequences: ["Insignificant", "Minor", "Moderate", "Major", "Catastrophic"],
+     riskTreatmentOptions: ["Avoid", "Reduce", "Share", "Retain"],
+     riskOwners: ["Operations Manager", "Finance Director", "HR Manager", "IT Manager", "Legal Counsel"],
+     riskReviewFrequencies: ["Monthly", "Quarterly", "Semi-Annually", "Annually"],
+     riskTypes: ["Financial", "Operational", "Strategic", "Compliance", "Reputational"],
+     riskSeverities: ["Low", "Medium", "High", "Critical"],
+     riskStatuses: ["Open", "In Progress", "Closed", "Under Review"],
+     associatedRisks: ["Risk A", "Risk B", "Risk C", "Risk D", "Risk E"],
+     plantLocations: ["Australia", "Peru", "Canada", "Chile", "Africa"],
+     plantAreas: ["KW01-CrushingFacility02", "KW01-PelletizingArea", "KW01-GrindingMill", "KW01-ConcentrationArea"],
+     assets: ["KW-Battery987", "KW-BoilerFeed98", "KW-BoilerDrum987", "KW-FuelGasLine"],
+     riskRatings: ["Very High", "High", "Medium", "Low"],
   };
 
   const choroplethData = [
@@ -202,6 +218,448 @@ const ChartCard: React.FC<{ title: string; children: React.ReactNode }> = ({ tit
     </CardContent>
   </Card>
 )
+/*
+const RiskManagementScreen: React.FC<{ sampleDropdownData: any }> = ({ sampleDropdownData }) => (
+  <div className="space-y-4">
+    <h2 className="text-2xl font-bold dark:text-white">Risk Management</h2>
+    <Card className="dark:bg-gray-800">
+      <CardHeader>
+        <CardTitle className="dark:text-white">Create Risk</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="riskNumber" className="dark:text-white">Risk Number</Label>
+            <Input id="riskNumber" placeholder="Enter risk number" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="riskName" className="dark:text-white">Risk Name</Label>
+            <Input id="riskName" placeholder="Enter risk name" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="riskDescription" className="dark:text-white">Risk Description</Label>
+            <Textarea id="riskDescription" placeholder="Enter risk description" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="site" className="dark:text-white">Site</Label>
+            <Select>
+              <SelectTrigger id="site" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select site" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.sites.map((site: string) => (
+                  <SelectItem key={site} value={site}>{site}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="operationCenter" className="dark:text-white">Operation Center</Label>
+            <Select>
+              <SelectTrigger id="operationCenter" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select operation center" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.operationCenters.map((center: string) => (
+                  <SelectItem key={center} value={center}>{center}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="facilities" className="dark:text-white">Facilities</Label>
+            <Select>
+              <SelectTrigger id="facilities" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select facilities" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.facilities.map((facility: string) => (
+                  <SelectItem key={facility} value={facility}>{facility}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskCategory" className="dark:text-white">Risk Category</Label>
+            <Select>
+              <SelectTrigger id="riskCategory" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk category" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskCategories.map((category: string) => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskLikelihood" className="dark:text-white">Risk Likelihood</Label>
+            <Select>
+              <SelectTrigger id="riskLikelihood" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk likelihood" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskLikelihoods.map((likelihood: string) => (
+                  <SelectItem key={likelihood} value={likelihood}>{likelihood}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskConsequence" className="dark:text-white">Risk Consequence</Label>
+            <Select>
+              <SelectTrigger id="riskConsequence" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk consequence" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskConsequences.map((consequence: string) => (
+                  <SelectItem key={consequence} value={consequence}>{consequence}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskTreatment" className="dark:text-white">Risk Treatment Option</Label>
+            <Select>
+              <SelectTrigger id="riskTreatment" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk treatment option" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskTreatmentOptions.map((option: string) => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskOwner" className="dark:text-white">Risk Owner</Label>
+            <Select>
+              <SelectTrigger id="riskOwner" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk owner" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskOwners.map((owner: string) => (
+                  <SelectItem key={owner} value={owner}>{owner}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskReviewFrequency" className="dark:text-white">Risk Review Frequency</Label>
+            <Select>
+              <SelectTrigger id="riskReviewFrequency" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select review frequency" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskReviewFrequencies.map((frequency: string) => (
+                  <SelectItem key={frequency} value={frequency}>{frequency}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="riskStatus" className="dark:text-white">Risk Status</Label>
+            <Select>
+              <SelectTrigger id="riskStatus" className="dark:bg-gray-700 dark:text-white">
+                <SelectValue placeholder="Select risk status" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleDropdownData.riskStatuses.map((status: string) => 
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end space-x-4">
+            <Button variant="outline" className="dark:bg-gray-700 dark:text-white">Cancel</Button>
+            <Button>Submit</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)*/
+
+
+const RiskManagementScreen: React.FC<{ sampleDropdownData: any }> = ({ sampleDropdownData }) => {
+  const [plannedCompletionDate, setPlannedCompletionDate] = useState<string>("")
+  const [plannedResolutionDate, setPlannedResolutionDate] = useState<string>("")
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold dark:text-white">Risk Management</h2>
+      
+      {/* Risk Register Details */}
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Risk Register Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="riskRegisterId" className="dark:text-white">Risk Register ID Number</Label>
+            <div className="relative flex-grow">
+              <Input id="riskRegisterId" value="32-RR-1191" readOnly className="pr-8 dark:bg-gray-700 dark:text-white" />             
+            </div>
+          </div>
+          
+          <div>
+            <Label className="dark:text-white">Risk Rating</Label>
+            <RadioGroup defaultValue="medium" className="flex space-x-4">
+              {sampleDropdownData.riskRatings.map((rating:string) => (
+                <div key={rating} className="flex items-center space-x-2">
+                  <RadioGroupItem value={rating.toLowerCase()} id={`rating-${rating.toLowerCase()}`} />
+                  <Label htmlFor={`rating-${rating.toLowerCase()}`}>{rating}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="plantLocation" className="dark:text-white">Plant location</Label>
+              <Select>
+                <SelectTrigger id="plantLocation" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select options" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.plantLocations.map((location: string) => (
+                    <SelectItem key={location} value={location}>{location}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="operationCenter" className="dark:text-white">Operation Center</Label>
+              <Select>
+                <SelectTrigger id="operationCenter" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select options" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.operationCenters.map((center: string) => (
+                    <SelectItem key={center} value={center}>{center}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="plantArea" className="dark:text-white">Plant Area</Label>
+              <Select>
+                <SelectTrigger id="plantArea" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Plant Area" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.plantAreas.map((area: string) => (
+                    <SelectItem key={area} value={area}>{area}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="assets" className="dark:text-white">Assets</Label>
+              <Select>
+                <SelectTrigger id="assets" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select assets" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.assets.map((asset: string) => (
+                    <SelectItem key={asset} value={asset}>{asset}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="plannedCompletion" className="dark:text-white">Planned Completion</Label>
+            <div className="flex">
+              <Input
+                type="date"
+                id="plannedCompletion"
+                value={plannedCompletionDate}
+                onChange={(e) => setPlannedCompletionDate(e.target.value)}
+                className="dark:bg-gray-700 dark:text-white"
+              />
+              <Button
+                variant="outline"
+                className="ml-2"
+                onClick={() => setPlannedCompletionDate("")}
+              >
+                Clear
+              </Button>
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="plantAreaDescription" className="dark:text-white">Plant Area description</Label>
+            <Textarea id="plantAreaDescription" placeholder="Add plant area description" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          
+          <div>
+            <Label htmlFor="riskDescription" className="dark:text-white">Risk Description</Label>
+            <Textarea id="riskDescription" placeholder="Add risk description" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Un-mitigated Risk Evaluation */}
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Un-mitigated Risk Evaluation</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="riskTypes" className="dark:text-white">Risk Types</Label>
+              <Select>
+                <SelectTrigger id="riskTypes" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Risk types" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.riskTypes.map((type: string) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="riskSeverity" className="dark:text-white">Risk Severity</Label>
+              <Select>
+                <SelectTrigger id="riskSeverity" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Risk severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.riskSeverities.map((severity: string) => (
+                    <SelectItem key={severity} value={severity}>{severity}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="monitoringInspection" className="dark:text-white">Monitoring and Inspection evaluation</Label>
+            <Textarea id="monitoringInspection" placeholder="Add monitoring and inspection comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="regulatoryRequirements" className="dark:text-white">Regulatory Requirements (If Any)</Label>
+            <Textarea id="regulatoryRequirements" placeholder="Add regulatory requirements comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Mitigated Risk Assessments */}
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Mitigated Risk Assessments</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="correctiveActionStatus" className="dark:text-white">Status of corrective actions of risk</Label>
+              <Select>
+                <SelectTrigger id="correctiveActionStatus" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Risk status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.riskStatuses.map((status: string) => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="mitigatedRiskSeverity" className="dark:text-white">Risk Severity</Label>
+              <Select>
+                <SelectTrigger id="mitigatedRiskSeverity" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Risk types" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.riskTypes.map((type: string) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="correctiveActionId" className="dark:text-white">Corrective Action ID</Label>
+            <Input id="correctiveActionId" placeholder="Search project ID" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="residualRiskAssessment" className="dark:text-white">Residual Risk Assessment</Label>
+            <Textarea id="residualRiskAssessment" placeholder="Add assessment comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="complianceStandards" className="dark:text-white">Compliance with Standards and Regulations</Label>
+            <Textarea id="complianceStandards" placeholder="Add assessment comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label className="dark:text-white">Upload Risk Assessment Report</Label>
+            <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Click to Upload or drag and drop</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">(Max. File size: 25 MB)</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Target Risk Plan */}
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Target Risk Plan</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="assignedTo" className="dark:text-white">Assigned To</Label>
+              <Select>
+                <SelectTrigger id="assignedTo" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select Risk status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.riskStatuses.map((status: string) => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="associatedParentRisk" className="dark:text-white">Associated Parent Risk</Label>
+              <Select>
+                <SelectTrigger id="associatedParentRisk" className="dark:bg-gray-700 dark:text-white">
+                  <SelectValue placeholder="Select associated risk" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sampleDropdownData.associatedRisks.map((risk: string) => (
+                    <SelectItem key={risk} value={risk}>{risk}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="specificActions" className="dark:text-white">Specific Actions to be taken</Label>
+            <Textarea id="specificActions" placeholder="Add assessment comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="auditObservations" className="dark:text-white">Audit Observations:</Label>
+            <Textarea id="auditObservations" placeholder="Add assessment comments" className="dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <Label htmlFor="plannedResolution" className="dark:text-white">Planned Time to Resolution</Label>
+            <Input id="plannedResolutionDate" type="date" className="dark:bg-gray-700 dark:text-white" />           
+          </div>
+        </CardContent>
+      </Card> 
+      <div className="flex justify-end space-x-4">
+            <Button variant="outline" className="dark:bg-gray-700 dark:text-white">Cancel</Button>
+            <Button>Submit</Button>
+     </div>
+    </div>
+  )
+}
 
 const HazardManagementScreen: React.FC<{ sampleDropdownData: any }> = ({ sampleDropdownData }) => (
   <div className="space-y-4">
@@ -648,6 +1106,8 @@ export default function Dashboard() {
         return ["Home", "Corrective Actions"]
       case "settings":
         return ["Home", "Settings"]
+      case "risk":
+          return ["Home", "Risk Management"]
       default:
         return ["Home", "Dashboard"]
     }
@@ -675,6 +1135,7 @@ export default function Dashboard() {
           <nav className="space-y-2 flex-grow">
             <SidebarItem icon={LayoutDashboard} onClick={() => setActiveScreen("dashboard")} active={activeScreen === "dashboard"} collapsed={sidebarCollapsed}>Dashboard</SidebarItem>
             <SidebarItem icon={Home} onClick={() => setActiveScreen("home")} active={activeScreen === "home"} collapsed={sidebarCollapsed}>Home</SidebarItem>
+            <SidebarItem icon={AlertOctagon} onClick={() => setActiveScreen("risk")} active={activeScreen === "risk"} collapsed={sidebarCollapsed}>Risk Management</SidebarItem>
             <SidebarItem icon={AlertTriangle} onClick={() => setActiveScreen("hazard")} active={activeScreen === "hazard"} collapsed={sidebarCollapsed}>Hazard Management</SidebarItem>
             <SidebarItem icon={CheckSquare} onClick={() => setActiveScreen("corrective")} active={activeScreen === "corrective"} collapsed={sidebarCollapsed}>Corrective Actions</SidebarItem>
             <SidebarItem icon={MessageSquare} onClick={() => setActiveScreen("messages")} active={activeScreen === "messages"} collapsed={sidebarCollapsed}>Messages</SidebarItem>
@@ -741,7 +1202,7 @@ export default function Dashboard() {
                 <span className="sr-only">Toggle theme</span>
               </div>
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src="https://cdn.prod.website-files.com/6365d860c7b7a7191055eb8a/65a752b920056b81613ea881_Olly%20Schroeder-p-500.jpg" alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </div>
@@ -906,6 +1367,7 @@ export default function Dashboard() {
                 </div>
               </>
             )}
+            {activeScreen === "risk" && <RiskManagementScreen sampleDropdownData={testData.sampleDropdownData} />}            
             {activeScreen === "hazard" && <HazardManagementScreen sampleDropdownData={testData.sampleDropdownData} />}
             {activeScreen === "corrective" && <CorrectiveActionScreen sampleDropdownData={testData.sampleDropdownData} />}
             {activeScreen === "settings" && (
